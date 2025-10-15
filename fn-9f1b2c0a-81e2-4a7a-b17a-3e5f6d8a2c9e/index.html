@@ -8,153 +8,103 @@
   <meta name="robots" content="noindex,nofollow">
 
   <style>
-    /* Fallbacks primero + variables después */
     :root{
       --bg-dark:#0b0f14;
-      --bg-card:rgba(10,14,20,.85);
+      --bg-card:rgba(10,14,20,.8);
       --text:#e6edf3;
       --accent:#00e58f;
       --accent-strong:#00ff9f;
       --muted:#9fb0c3;
       --border:rgba(255,255,255,.12);
     }
-
     html,body{height:100%}
-
     body{
       margin:0;
-      color:#e6edf3;                 /* fallback */
       color:var(--text);
-      background:#000;               /* fallback */
-      background: linear-gradient(135deg,#000 0%,#0b0f14 50%,#001a12 100%);
+      background:linear-gradient(135deg,#000 0%,#0b0f14 50%,#001a12 100%);
       background-size:300% 300%;
-      -webkit-animation: gradientMove 12s ease infinite;
-              animation: gradientMove 12s ease infinite;
-      font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,"Cascadia Mono","Courier New",monospace;
-      display:flex; align-items:center; justify-content:center; padding:24px;
-      min-height:100vh;
-    }
-
-    @-webkit-keyframes gradientMove{
-      0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% }
+      animation:gradientMove 12s ease infinite;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Cascadia Mono","Courier New",monospace;
+      display:flex;align-items:center;justify-content:center;padding:24px;min-height:100vh;
     }
     @keyframes gradientMove{
-      0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% }
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
     }
-
     body::before{
-      content:"";
-      position:fixed; inset:0; pointer-events:none; z-index:1;
-      background: repeating-linear-gradient(
-        rgba(0,229,143,0.04) 0px,
-        rgba(0,229,143,0.04) 1px,
-        transparent 2px,
-        transparent 4px
-      );
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+      background:repeating-linear-gradient(rgba(0,229,143,0.04) 0px,rgba(0,229,143,0.04) 1px,transparent 2px,transparent 4px);
     }
-
     .wrap{
-      width:100%;
-      max-width:820px;
-      position:relative; z-index:2;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.12);    /* fallback */
-      border:1px solid var(--border);
-      background:#0f141c;                        /* fallback */
+      width:min(700px,100%);position:relative;z-index:2;
+      border-radius:18px;border:1px solid var(--border);
       background:var(--bg-card);
-      -webkit-backdrop-filter: blur(6px);
-              backdrop-filter: blur(6px);
-      box-shadow:0 8px 30px rgba(0,0,0,.28), inset 0 0 0 1px rgba(0,255,159,.05);
+      box-shadow:0 8px 30px rgba(0,0,0,.28),inset 0 0 0 1px rgba(0,255,159,.05);
       padding:22px;
     }
-
     h1{
-      margin:0 0 8px 0;
-      text-transform:uppercase; letter-spacing:.06em;
-      font-weight:900;
-      font-size:32px;               /* fallback */
-      /* si el navegador soporta clamp, usará esto y sobrescribe: */
-      font-size:clamp(24px,5vw,40px);
-      color:#00ff9f;                /* fallback */
+      margin:0 0 8px 0;text-transform:uppercase;letter-spacing:.06em;
+      font-weight:900;font-size:clamp(24px,5vw,38px);
       color:var(--accent-strong);
-      text-shadow:0 0 6px rgba(0,255,159,.9), 0 0 14px rgba(0,229,143,.8);
+      text-shadow:0 0 6px var(--accent-strong),0 0 14px var(--accent);
     }
-
-    p{ margin:10px 0; color:#d6e8e0 }
-    .hint{ color:#ffd36b; font-weight:700; margin-top:8px }
-    .rule{ color:#9fb0c3; font-size:13px; margin-top:8px }
-
+    p{margin:10px 0;color:#d6e8e0}
+    .hint{color:#ffd36b;font-weight:700;margin-top:8px}
+    .rule{color:var(--muted);font-size:13px;margin-top:8px}
     .form{
-      display:grid; gap:10px; margin-top:16px;
+      display:grid;gap:10px;margin-top:16px;
       grid-template-columns: 1fr 1fr auto;
+      justify-items:center;
     }
-
-    label{ font-size:12px; color:#bdebdc; letter-spacing:.02em }
-
+    label{font-size:12px;color:#bdebdc;letter-spacing:.02em;display:block;text-align:left;width:100%}
     input{
-      width:100%; padding:10px 12px; border-radius:10px;
-      border:1px solid rgba(0,255,159,.15);
-      background:rgba(255,255,255,.06);   /* un poco más claro p/compatibilidad */
-      color:#e6edf3;
+      width:80%;padding:8px 10px;border-radius:10px;border:1px solid rgba(0,255,159,.15);
+      background:rgba(255,255,255,.05);color:var(--text);font-size:14px;text-align:center;
     }
-
     button{
-      padding:10px 14px; border-radius:10px;
-      border:1px solid rgba(0,255,159,.35);
-      background:rgba(0,255,159,.18); color:#e6fff5;
-      font-weight:800; cursor:pointer;
+      padding:8px 14px;border-radius:10px;border:1px solid rgba(0,255,159,.35);
+      background:rgba(0,255,159,.12);color:#e6fff5;font-weight:800;cursor:pointer;
       box-shadow:0 0 8px rgba(0,255,159,.2);
     }
-    button:hover{ background:rgba(0,255,159,.24) }
-
-    .topbar{
-      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px
-    }
-    .back{
-      color:#bdebdc; text-decoration:none;
-      border-bottom:1px dashed rgba(0,255,159,.35)
-    }
+    button:hover{background:rgba(0,255,159,.18)}
     .stand{
-      font-size:13px; color:#c9f7e7;
-      background:rgba(0,255,159,.10); border:1px dashed rgba(0,255,159,.35);
-      padding:4px 8px; border-radius:999px
+      font-size:13px;color:#c9f7e7;background:rgba(0,255,159,.10);
+      border:1px dashed rgba(0,255,159,.35);padding:4px 8px;border-radius:999px;
+      display:inline-block;margin-bottom:10px;
     }
-
     @media (max-width:760px){
-      .form{ grid-template-columns:1fr }
-      button{ width:100% }
+      .form{grid-template-columns:1fr}
+      input{width:100%}
+      button{width:100%}
     }
   </style>
 </head>
 <body>
   <main class="wrap" role="main">
-    <div class="topbar">
-      <a class="back" href="https://neosupport7.github.io/">← Volver al sitio</a>
-      <span class="stand">Stand: Fortinet • Reto #1</span>
-    </div>
-
+    <span class="stand">Stand: Fortinet • Reto #1</span>
     <h1>Mini-CTF — Fortinet</h1>
     <p>
-      La bandera está <strong>oculta en el código fuente</strong> de esta página.
-      Inspecciona el HTML y escríbela en el campo de abajo en el formato <code>FLAG{...}</code>.
+      La bandera está <strong>oculta en el código fuente</strong> de esta página.<br>
+      Inspecciona el HTML y escríbela en el campo de abajo con el formato <code>FLAG=XXXX</code>.
     </p>
     <p class="hint">Pista: busca un comentario HTML.</p>
-    <p class="rule">Formato aceptado: <code>FLAG{MAYÚSCULAS_Y_GUIONES}</code>. No compartas la solución públicamente.</p>
+    <p class="rule">Formato aceptado: <code>FLAG=PALABRAS-CON-GUIONES</code>. No compartas la respuesta públicamente.</p>
 
-    <!-- 🔒 Bandera oculta para los asistentes (tu solución) -->
-    <!-- FLAG{FORTI-INSPECTOR} -->
+    <!-- 🔒 Bandera oculta -->
+    <!-- FLAG=FORTI-INSPECTOR -->
 
-    <!-- Formulario (placeholder). Luego conectamos el endpoint de Apps Script -->
+    <!-- Formulario (placeholder) -->
     <form class="form" action="#" method="post" onsubmit="event.preventDefault(); alert('¡Respuesta enviada! (Luego conectaremos este formulario al sistema de puntuación)');">
       <div>
         <label for="alias">Alias</label>
         <input id="alias" name="alias" type="text" required pattern="^[A-Za-z0-9_-]{4,16}$" placeholder="tu_alias" autocomplete="off">
       </div>
       <div>
-        <label for="flag">Bandera (FLAG{...})</label>
-        <input id="flag" name="flag" type="text" required placeholder="FLAG{FORTI-XXXX}" autocomplete="off">
+        <label for="flag">Bandera (FLAG=...)</label>
+        <input id="flag" name="flag" type="text" required placeholder="FLAG=FORTI-XXXX" autocomplete="off">
       </div>
-      <div style="display:flex; align-items:flex-end">
+      <div style="display:flex;align-items:flex-end">
         <button type="submit">Enviar</button>
       </div>
     </form>
