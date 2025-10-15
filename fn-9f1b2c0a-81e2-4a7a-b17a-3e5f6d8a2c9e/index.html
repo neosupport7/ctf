@@ -25,6 +25,7 @@
       animation: gradientMove 12s ease infinite;
       font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,"Cascadia Mono","Courier New",monospace;
       display:flex; align-items:center; justify-content:center; padding:24px;
+      min-height:100vh;
     }
     @keyframes gradientMove{
       0%{ background-position:0% 50% } 50%{ background-position:100% 50% } 100%{ background-position:0% 50% }
@@ -63,3 +64,49 @@
       box-shadow:0 0 8px rgba(0,255,159,.2);
     }
     button:hover{ background:rgba(0,255,159,.18) }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px
+    }
+    .back{ color:#bdebdc; text-decoration:none; border-bottom:1px dashed rgba(0,255,159,.35) }
+    .stand{ font-size:13px; color:#c9f7e7; background:rgba(0,255,159,.10); border:1px dashed rgba(0,255,159,.35); padding:4px 8px; border-radius:999px }
+    @media (max-width:760px){
+      .form{ grid-template-columns:1fr }
+      button{ width:100% }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap" role="main">
+    <div class="topbar">
+      <a class="back" href="https://neosupport7.github.io/">← Volver al sitio</a>
+      <span class="stand">Stand: Fortinet • Reto #1</span>
+    </div>
+
+    <h1>Mini-CTF — Fortinet</h1>
+    <p>
+      La bandera está <strong>oculta en el código fuente</strong> de esta página.  
+      Inspecciona el HTML y escríbela en el campo de abajo en el formato <code>FLAG{...}</code>.
+    </p>
+    <p class="hint">Pista: busca un comentario HTML.</p>
+    <p class="rule">Formato aceptado: <code>FLAG{MAYÚSCULAS_Y_GUIONES}</code>. No compartas la solución públicamente.</p>
+
+    <!-- 🔒 Bandera oculta para los asistentes (tu solución) -->
+    <!-- FLAG{FORTI-INSPECTOR} -->
+
+    <!-- Formulario (placeholder). Luego conectamos el endpoint de Apps Script -->
+    <form class="form" action="#" method="post" onsubmit="event.preventDefault(); alert('¡Respuesta enviada! (Luego conectaremos este formulario al sistema de puntuación)');">
+      <div>
+        <label for="alias">Alias</label>
+        <input id="alias" name="alias" type="text" required pattern="^[A-Za-z0-9_-]{4,16}$" placeholder="tu_alias" autocomplete="off">
+      </div>
+      <div>
+        <label for="flag">Bandera (FLAG{...})</label>
+        <input id="flag" name="flag" type="text" required placeholder="FLAG{FORTI-XXXX}" autocomplete="off">
+      </div>
+      <div style="display:flex; align-items:flex-end">
+        <button type="submit">Enviar</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
