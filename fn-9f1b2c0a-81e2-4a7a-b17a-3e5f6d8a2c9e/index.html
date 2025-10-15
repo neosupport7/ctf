@@ -85,12 +85,7 @@
     const flag  = document.getElementById('flag').value.trim();
     if (!alias || !flag) { alert('Por favor completa alias y respuesta.'); return; }
 
-    // Enviar como x-www-form-urlencoded para evitar preflight CORS
-    const params = new URLSearchParams({
-      station_id: STATION_ID,
-      alias,
-      flag
-    });
+    const params = new URLSearchParams({ station_id: STATION_ID, alias, flag });
 
     try {
       const res = await fetch(ENDPOINT, {
@@ -98,20 +93,15 @@
         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
         body: params.toString()
       });
-
-      const data = await res.json(); // Apps Script responde JSON de nuestro lado
-      if (!data.ok) { alert(data.msg || 'Error al registrar. Intenta de nuevo.'); return; }
-      if (data.correct) {
-        alert(`✅ ¡Correcto! +${data.points} puntos.`);
-      } else {
-        alert('❌ Respuesta incorrecta. Intenta de nuevo.');
-      }
+      const data = await res.json();
+      if (!data.ok) { alert(data.msg || 'Error al registrar.'); return; }
+      alert(data.correct ? `✅ ¡Correcto! +${data.points} puntos.` : '❌ Respuesta incorrecta. Intenta de nuevo.');
     } catch (err) {
-      console.error(err);
       alert('Error de red o servidor. Intenta más tarde.');
     }
   });
 </script>
+
 
 </body>
 </html>
