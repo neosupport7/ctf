@@ -73,52 +73,45 @@
     </form>
   </main>
 
-  <script>
-    // ENDPOINT de tu Apps Script (ya integrado)
-    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
-    const STATION_ID = 'fortinet-1';
+<script>
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
+  const STATION_ID = 'fortinet-1';
 
-    const form = document.getElementById('ctfForm');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  const form = document.getElementById('ctfForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const aliasEl = document.getElementById('alias');
-      const flagEl  = document.getElementById('flag');
+    const alias = document.getElementById('alias').value.trim();
+    const flag  = document.getElementById('flag').value.trim();
+    if (!alias || !flag) { alert('Por favor completa alias y respuesta.'); return; }
 
-      const alias = aliasEl.value.trim();
-      const flag  = flagEl.value.trim();
-
-      if (!alias || !flag) {
-        alert('Por favor completa alias y respuesta.');
-        return;
-      }
-
-      const payload = { station_id: STATION_ID, alias, flag };
-
-      try {
-        const res = await fetch(ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          mode: 'cors'
-        });
-        const data = await res.json();
-
-        if (!data.ok) {
-          alert(data.msg || 'Error al registrar. Intenta de nuevo.');
-          return;
-        }
-
-        if (data.correct) {
-          alert(`✅ ¡Correcto! +${data.points} puntos.`);
-        } else {
-          alert('❌ Respuesta incorrecta. Intenta de nuevo.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error de red o servidor. Intenta más tarde.');
-      }
+    // Enviar como x-www-form-urlencoded para evitar preflight CORS
+    const params = new URLSearchParams({
+      station_id: STATION_ID,
+      alias,
+      flag
     });
-  </script>
+
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: params.toString()
+      });
+
+      const data = await res.json(); // Apps Script responde JSON de nuestro lado
+      if (!data.ok) { alert(data.msg || 'Error al registrar. Intenta de nuevo.'); return; }
+      if (data.correct) {
+        alert(`✅ ¡Correcto! +${data.points} puntos.`);
+      } else {
+        alert('❌ Respuesta incorrecta. Intenta de nuevo.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de red o servidor. Intenta más tarde.');
+    }
+  });
+</script>
+
 </body>
 </html>
