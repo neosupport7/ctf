@@ -48,12 +48,12 @@
     <span class="stand">Stand: Fortinet • Reto #1</span>
     <h1 id="title">Mini-CTF — Fortinet</h1>
 
-    <p>La bandera está <strong>oculta en el código fuente</strong> de esta página.<br>Inspecciona el HTML y escribe la respuesta en el campo de abajo tal cual: <code>FORTI-XXXX</code>.</p>
+    <p>La bandera está <strong>oculta en el código fuente</strong> de esta página.<br>Inspecciona el HTML y escribe la respuesta exactamente así: <code>FORTI-INSPECTOR</code>.</p>
     <p class="hint">Pista: busca un comentario HTML.</p>
-    <p class="rule">Formato a enviar: solo la cadena (ej. <code>FORTI-XXXX</code>). No compartas la solución públicamente.</p>
+    <p class="rule">Formato a enviar: solo la cadena (ej. <code>FORTI-INSPECTOR</code>). No compartas la solución públicamente.</p>
 
     <!-- BANDERA OCULTA (para quienes inspeccionan): -->
-    <!!!!!!!!!!!!!!!!!!!!-- FORTI-INSPECTOR --!!!!!!!!!!!!!!!!!!!>
+    <!-- FORTI-INSPECTOR -->
 
     <!-- FORMULARIO -->
     <form id="ctfForm" class="form" autocomplete="off">
@@ -74,8 +74,8 @@
   </main>
 
   <script>
-    // Reemplaza por la URL de tu Web App (Apps Script).
-    const ENDPOINT = 'PON_AQUI_TU_WEB_APP_URL';
+    // ENDPOINT de tu Apps Script (ya integrado)
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
     const STATION_ID = 'fortinet-1';
 
     const form = document.getElementById('ctfForm');
@@ -86,7 +86,6 @@
       const flagEl  = document.getElementById('flag');
 
       const alias = aliasEl.value.trim();
-
       const flag  = flagEl.value.trim();
 
       if (!alias || !flag) {
@@ -94,11 +93,7 @@
         return;
       }
 
-      const payload = {
-        station_id: STATION_ID,
-        alias,
-        flag
-      };
+      const payload = { station_id: STATION_ID, alias, flag };
 
       try {
         const res = await fetch(ENDPOINT, {
