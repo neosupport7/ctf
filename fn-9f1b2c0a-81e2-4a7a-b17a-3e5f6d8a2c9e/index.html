@@ -38,9 +38,7 @@
     p{margin:10px 0;color:#d6e8e0;line-height:1.4}
     .hint{color:var(--warn);font-weight:700;margin-top:8px}
     .rule{color:var(--muted);font-size:13px;margin-top:8px}
-    .form{
-      display:flex;flex-direction:column;gap:12px;margin-top:16px;
-    }
+    .form{display:flex;flex-direction:column;gap:12px;margin-top:16px}
     label{font-size:13px;color:#cfe6dd;opacity:.95}
     input{
       width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);
@@ -88,7 +86,7 @@
 
       <!-- Alias (abajo) -->
       <div>
-        <label for="alias">Alias</label>
+        <label for="alias">Alias (utiliza el mismo alias en todos los retos; será visible en el ranking board)</label>
         <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
       </div>
 
@@ -104,7 +102,7 @@
 
   <script>
     // === CONFIG ===
-    const ENDPOINT = 'YOUR_APPS_SCRIPT_URL_HERE'; // <-- Reemplaza por tu URL de despliegue de Apps Script
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
     const STATION_ID = 'fortinet-1';
 
     const form = document.getElementById('loginForm');
@@ -136,12 +134,12 @@
       btn.disabled = true; btn.textContent = 'Enviando...';
 
       try{
-        // Usamos x-www-form-urlencoded para que Apps Script lo reciba en e.parameter
+        // x-www-form-urlencoded para que llegue en e.parameter
         const body = new URLSearchParams({
           station_id: STATION_ID,
           alias: userAlias,
           flag: pwd,
-          user_agent: navigator.userAgent // se registrará en la hoja
+          user_agent: navigator.userAgent
         });
 
         const res = await fetch(ENDPOINT, {
@@ -153,7 +151,6 @@
         const json = await res.json();
 
         if(!json.ok){
-          // Mensajes esperados desde Apps Script (ej. alias duplicado o station_id no configurado)
           statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'No se pudo registrar la respuesta.') + '</span>';
         }else{
           if(json.correct){
@@ -177,4 +174,5 @@
   </script>
 </body>
 </html>
+
 
