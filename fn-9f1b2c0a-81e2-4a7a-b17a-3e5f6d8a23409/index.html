@@ -82,19 +82,25 @@
       <div class="hash">b9bc6c9447b005d88727d3b01f2d0a35</div>
     </div>
 
-    <p class="hint">Pista: técnica de ingeniería social.</p>
+    <p class="hint">Pista: técnica de ingeniería social </p>
 
     <form id="loginForm" class="form" autocomplete="off" novalidate>
-      <!-- Flag / Contraseña (arriba) -->
+      <!-- Flag / Contraseña -->
       <div>
         <label for="flag">Contraseña / Flag (palabra)</label>
         <input id="flag" name="flag" type="text" placeholder="XXXXXXX" maxlength="40" autocomplete="off" required aria-required="true">
       </div>
 
-      <!-- Alias (abajo) -->
+      <!-- Alias -->
       <div>
         <label for="alias">Alias (utiliza el mismo alias en todos los retos; será visible en el ranking board)</label>
         <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
+      </div>
+
+      <!-- Compañía -->
+      <div>
+        <label for="company">Compañía</label>
+        <input id="company" name="company" type="text" placeholder="empresa" maxlength="50" autocomplete="off">
       </div>
 
       <!-- Botón -->
@@ -115,6 +121,7 @@
     const form = document.getElementById('loginForm');
     const flagInput = document.getElementById('flag');
     const aliasInput = document.getElementById('alias');
+    const companyInput = document.getElementById('company');
     const statusEl = document.getElementById('status');
     const okEl = document.getElementById('flagOK');
     const btn = document.getElementById('submitBtn');
@@ -126,6 +133,7 @@
 
       const flagVal = (flagInput.value || '').trim();
       const userAlias = (aliasInput.value || '').trim();
+      const companyVal = (companyInput.value || '').trim();
 
       if(flagVal.length < 3){
         statusEl.innerHTML = '<span class="err">Escribe la palabra completa.</span>';
@@ -141,9 +149,11 @@
       btn.disabled = true; btn.textContent = 'Enviando...';
 
       try{
+        // x-www-form-urlencoded para que llegue en e.parameter
         const body = new URLSearchParams({
           station_id: STATION_ID,
           alias: userAlias,
+          company: companyVal,
           flag: flagVal,
           user_agent: navigator.userAgent
         });
