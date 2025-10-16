@@ -73,36 +73,36 @@
 </head>
 <body>
   <main class="wrap" role="main" aria-labelledby="title">
-    <h1 id="title">Mini-CTF — Reto 1 (Fortinet)</h1>
+    <h1 id="title">CTF — Reto 1 (Fortinet)</h1>
     <p><strong>¿Cuál es el login de este portal?</strong><br>
       El usuario dejó el usuario: <strong>admin</strong>.<br>
       La contraseña es un número de <strong>4 dígitos</strong>.
     </p>
-    <p class="hint">Pista: ¿En qué año nació Fortinet?</p>
-    <p class="rule">Regla: escribe solo 4 dígitos. Ejemplo de formato: <code>2000</code>.</p>
+    <p class="hint">Pista: nacimiento de Fortinet</p>
+    <p class="rule"></p>
 
     <form id="loginForm" class="form" autocomplete="off">
       <div>
-        <label for="user">Usuario</label>
+        <label for="user">Alias: (tu alias aparecera en el ranking board)</label>
         <input id="user" name="user" type="text" value="admin" readonly aria-readonly="true">
       </div>
       <div>
-        <label for="pass">Contraseña (4 dígitos)</label>
+        <label for="pass">Contraseña</label>
         <input id="pass" name="pass" type="tel" inputmode="numeric" pattern="\\d{4}" maxlength="4" placeholder="####" autocomplete="off" required>
       </div>
       <div>
-        <button type="submit" aria-label="Probar login">Probar</button>
+        <button type="submit" aria-label="Probar login">Enviar</button>
       </div>
     </form>
 
     <div id="status" class="status" aria-live="polite"></div>
     <div id="flag" class="flag" style="display:none">HLMX{fortinet_2000}</div>
 
-    <p class="footer">Tip: algunos navegadores móviles ocultan el teclado numérico si no usas <em>inputmode="numeric"</em>; ya está habilitado.</p>
+    <p class="footer"></p>
   </main>
 
   <script>
-    // Hash esperado de "2000" con SHA-256 (hex):
+
     const EXPECTED_HEX = "81a83544cf93c245178cbc1620030f1123f435af867c79d87135983c52ab39d9";
 
     async function sha256Hex(text){
@@ -125,18 +125,18 @@
       const pwd = (pass.value || "").trim();
 
       if(!/^\d{4}$/.test(pwd)){
-        statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos (ej. 2000).</span>';
+        statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos .</span>';
         return;
       }
 
       try{
         const hex = await sha256Hex(pwd);
         if(hex === EXPECTED_HEX){
-          statusEl.innerHTML = '<span class="ok">¡Correcto! Credenciales válidas.</span>';
+          statusEl.innerHTML = '<span class="ok">¡Correcto! Credenciales válidas, obtuviste 500 puntos.</span>';
           flagEl.style.display = "block";
           // Opcional: aquí podrías hacer fetch() a tu backend para registrar solve
         }else{
-          statusEl.innerHTML = '<span class="err">Credenciales incorrectas. Revisa la pista.</span>';
+          statusEl.innerHTML = '<span class="err">Respuesta incorrecta.</span>';
         }
       }catch(err){
         console.error(err);
