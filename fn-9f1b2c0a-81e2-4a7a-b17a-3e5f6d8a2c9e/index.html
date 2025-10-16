@@ -121,7 +121,7 @@
       const userAlias = (alias.value || '').trim();
 
       if(!/^\d{4}$/.test(pwd)){
-        statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos (ej. 2000).</span>';
+        statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos.</span>';
         pass.focus();
         return;
       }
