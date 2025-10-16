@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CTF — Reto 2 (SANS — MD5)</title>
-  <meta name="description" content="Mini-CTF: Reto SANS — Descifra el hash MD5 y envía la palabra original." />
+  <meta name="description" content="Mini-CTF: Reto SANS — Descifra el hash MD5 y envía la palabra original (MAYÚSCULAS)." />
   <meta name="robots" content="noindex,nofollow">
   <style>
     :root{
@@ -74,21 +74,21 @@
     <h1 id="title">CTF — Reto 2 (SANS — MD5)</h1>
 
     <p><strong>Este hash MD5 pertenece a una palabra común en ciberseguridad.</strong><br>
-      Descifra el hash y escribe la palabra original como <strong>Contraseña / Flag</strong>.
+      Descifra el hash y escribe la palabra original como <strong>Contraseña / Flag</strong> (MAYÚSCULAS).
     </p>
 
     <div>
       <div class="rule">MD5 hash:</div>
-      <div class="hash">b9bc6c9447b005d88727d3b01f2d0a35</div>
+      <div class="hash">929d49d1aa61d564a03f0bef4bd08d5a</div>
     </div>
 
-    <p class="hint">Pista: técnica de ingeniería social </p>
+    <p class="hint">Pista: técnica de ingeniería social para engañar usuarios. (Escríbela en MAYÚSCULAS)</p>
 
     <form id="loginForm" class="form" autocomplete="off" novalidate>
       <!-- Flag / Contraseña -->
       <div>
-        <label for="flag">Contraseña / Flag (palabra)</label>
-        <input id="flag" name="flag" type="text" placeholder="XXXXXXX" maxlength="40" autocomplete="off" required aria-required="true">
+        <label for="flag">Contraseña / Flag (MAYÚSCULAS)</label>
+        <input id="flag" name="flag" type="text" placeholder="PHISHING" maxlength="40" autocomplete="off" required aria-required="true" style="text-transform:uppercase">
       </div>
 
       <!-- Alias -->
@@ -131,12 +131,13 @@
       statusEl.textContent = '';
       okEl.style.display = 'none';
 
-      const flagVal = (flagInput.value || '').trim();
+      // Force uppercase for submission to match server flag
+      const flagVal = (flagInput.value || '').trim().toUpperCase();
       const userAlias = (aliasInput.value || '').trim();
       const companyVal = (companyInput.value || '').trim();
 
       if(flagVal.length < 3){
-        statusEl.innerHTML = '<span class="err">Escribe la palabra completa.</span>';
+        statusEl.innerHTML = '<span class="err">Escribe la palabra completa en MAYÚSCULAS.</span>';
         flagInput.focus();
         return;
       }
@@ -149,7 +150,6 @@
       btn.disabled = true; btn.textContent = 'Enviando...';
 
       try{
-        // x-www-form-urlencoded para que llegue en e.parameter
         const body = new URLSearchParams({
           station_id: STATION_ID,
           alias: userAlias,
@@ -184,7 +184,11 @@
       }
     });
 
-    // UX
+    // UX: force visual uppercase while typing
+    flagInput.addEventListener('input', () => {
+      flagInput.value = flagInput.value.toUpperCase();
+    });
+
     window.addEventListener('DOMContentLoaded', () => flagInput.focus());
     function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   </script>
