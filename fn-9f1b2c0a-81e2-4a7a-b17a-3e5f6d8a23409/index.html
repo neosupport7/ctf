@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CTF — Reto 2 (SANS — MD5)</title>
-  <meta name="description" content="Mini-CTF: Reto SANS — Descifra el hash MD5 y envía la palabra original (MAYÚSCULAS)." />
+  <title>CTF — Reto 2 (SANS — Base64)</title>
+  <meta name="description" content="Mini-CTF: Reto SANS — Decodifica el Base64 y envía la palabra original (MAYÚSCULAS)." />
   <meta name="robots" content="noindex,nofollow">
   <style>
     :root{
@@ -62,24 +62,24 @@
       border-radius:12px;background:rgba(0,255,159,.06);color:#c9ffe8;font-weight:800;
       word-break:break-all;display:none
     }
-    .hash{
+    .code{
       margin-top:10px;padding:12px;border:1px dashed rgba(255,255,255,.14);
-      border-radius:12px;background:rgba(255,255,255,.03);color:#e7f6f1;word-break:break-all
+      border-radius:12px;background:rgba(255,255,255,.03);color:#e7f6f1;word-break:break-all;font-family:monospace
     }
     @media (max-width:640px){ button{width:100%} .form{gap:10px} }
   </style>
 </head>
 <body>
   <main class="wrap" role="main" aria-labelledby="title">
-    <h1 id="title">CTF — Reto 2 (SANS — MD5)</h1>
+    <h1 id="title">CTF — Reto 2 (SANS — Base64)</h1>
 
-    <p><strong>Este hash MD5 pertenece a una palabra común en ciberseguridad.</strong><br>
-      Descifra el hash y escribe la palabra original como <strong>Contraseña / Flag</strong> (MAYÚSCULAS).
+    <p><strong>Este texto está codificado en Base64.</strong><br>
+      Decodifícalo y escribe la palabra original como <strong>Contraseña / Flag</strong> (MAYÚSCULAS).
     </p>
 
     <div>
-      <div class="rule">MD5 hash:</div>
-      <div class="hash">929d49d1aa61d564a03f0bef4bd08d5a</div>
+      <div class="rule">Base64:</div>
+      <div class="code">UEhJU0hJTkc=</div>
     </div>
 
     <p class="hint">Pista: técnica de ingeniería social.</p>
@@ -88,7 +88,7 @@
       <!-- Flag / Contraseña -->
       <div>
         <label for="flag">Contraseña / Flag (MAYÚSCULAS)</label>
-        <input id="flag" name="flag" type="text" placeholder="XXXXXX" maxlength="40" autocomplete="off" required aria-required="true" style="text-transform:uppercase">
+        <input id="flag" name="flag" type="text" placeholder="XXXXX" maxlength="40" autocomplete="off" required aria-required="true" style="text-transform:uppercase">
       </div>
 
       <!-- Alias -->
