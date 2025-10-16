@@ -110,7 +110,84 @@
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
     const STATION_ID = 'fortinet-1';
 
-    const form = document.getElem
-::contentReference[oaicite:0]{index=0}
+    const form = document.getElementById('loginForm');
+    const passInput = document.getElementById('pass');
+    const aliasInput = document.getElementById('alias');
+    const companyInput = document.getElementById('company');
+    const statusEl = document.getElementById('status');
+    const okEl = document.getElementById('flagOK');
+    const btn = document.getElementById('submitBtn');
 
+    // Escape simple HTML for status messages
+    function escapeHtml(s){ return String(s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = '';
+      okEl.style.display = 'none';
+
+      const pwd = (passInput.value || '').trim();
+      const userAlias = (aliasInput.value || '').trim();
+      const companyVal = (companyInput.value || '').trim();
+
+      // Validaciones
+      if (!/^\d{4}$/.test(pwd)) {
+        statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos (ej. 2000).</span>';
+        passInput.focus();
+        return;
+      }
+      if (userAlias.length < 2) {
+        statusEl.innerHTML = '<span class="err">Escribe un alias válido (mínimo 2 caracteres).</span>';
+        aliasInput.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const body = new URLSearchParams({
+          station_id: STATION_ID,
+          alias: userAlias,
+          company: companyVal,
+          flag: pwd,
+          user_agent: navigator.userAgent
+        });
+
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: body.toString()
+        });
+
+        // Si la respuesta no es JSON (error 500 u otro) eso se captura abajo
+        const json = await res.json();
+
+        if (!json.ok) {
+          // respuesta de servidor con ok=false
+          statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'No se pudo registrar la respuesta.') + '</span>';
+        } else {
+          // ok:true
+          if (json.correct) {
+            statusEl.innerHTML = '<span class="ok">¡Correcto! Respuesta válida — obtuviste ' + (json.points || 0) + ' puntos.</span>';
+            okEl.style.display = 'block';
+            // opcional: mostrar la bandera real aquí o enlazar a la siguiente pista
+          } else {
+            // En tu configuración actual, respuestas incorrectas no se registran (doPost devuelve ok:true, correct:false)
+            statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'Respuesta incorrecta. Intenta de nuevo.') + '</span>';
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.innerHTML = '<span class="err">Error de red o del servicio. Intenta nuevamente.</span>';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar respuesta';
+      }
+    });
+
+    // UX: foco inicial
+    window.addEventListener('DOMContentLoaded', () => passInput.focus());
+  </script>
+</body>
+</html>
