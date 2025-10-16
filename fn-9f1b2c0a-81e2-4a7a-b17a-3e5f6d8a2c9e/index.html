@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CTF #1 — Fortinet</title>
+  <title>CTF — Reto 1 (Fortinet)</title>
   <meta name="description" content="Mini-CTF: Reto 1 — Descubre el login correcto usando la pista." />
   <meta name="robots" content="noindex,nofollow">
   <style>
@@ -39,22 +39,22 @@
     .hint{color:var(--warn);font-weight:700;margin-top:8px}
     .rule{color:var(--muted);font-size:13px;margin-top:8px}
     .form{
-      display:grid;gap:10px;margin-top:16px;
-      grid-template-columns:1fr 1fr auto;align-items:end;
+      display:flex;flex-direction:column;gap:12px;margin-top:16px;
     }
-    label{font-size:12px;color:#cfe6dd;opacity:.9}
+    label{font-size:13px;color:#cfe6dd;opacity:.95}
     input{
       width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);
-      background:#0a1218;color:var(--text);outline:none;
+      background:#0a1218;color:var(--text);outline:none;font-size:15px;
     }
-    input[readonly]{opacity:.85}
     input::placeholder{color:#8aa3a0}
     button{
       padding:12px 16px;border-radius:12px;border:1px solid var(--border);
       background:linear-gradient(180deg,#0f1e1a,#0b1613);color:var(--text);cursor:pointer;
       font-weight:800;letter-spacing:.03em;text-transform:uppercase;
       box-shadow:inset 0 0 0 1px rgba(0,255,159,.1);
+      align-self:flex-start;
     }
+    button[disabled]{opacity:.6;cursor:not-allowed}
     button:hover{box-shadow:0 0 20px rgba(0,255,159,.12),inset 0 0 0 1px rgba(0,255,159,.2)}
     .status{margin-top:14px;font-size:14px}
     .ok{color:var(--ok)}
@@ -62,90 +62,119 @@
     .flag{
       margin-top:16px;padding:14px;border:1px dashed rgba(0,255,159,.35);
       border-radius:12px;background:rgba(0,255,159,.06);color:#c9ffe8;font-weight:800;
-      word-break:break-all
+      word-break:break-all;display:none
     }
-    .footer{margin-top:14px;color:var(--muted);font-size:12px}
-    @media (max-width:640px){
-      .form{grid-template-columns:1fr;align-items:stretch}
-      button{width:100%}
-    }
+    @media (max-width:640px){ button{width:100%} .form{gap:10px} }
   </style>
 </head>
 <body>
   <main class="wrap" role="main" aria-labelledby="title">
     <h1 id="title">CTF — Reto 1 (Fortinet)</h1>
+
     <p><strong>¿Cuál es el login de este portal?</strong><br>
       El usuario dejó el usuario: <strong>admin</strong>.<br>
       La contraseña es un número de <strong>4 dígitos</strong>.
     </p>
-    <p class="hint">Pista: nacimiento de Fortinet</p>
-    <p class="rule"></p>
 
-    <form id="loginForm" class="form" autocomplete="off">
+    <p class="hint">Pista: ¿en qué año nació Fortinet?</p>
+    <p class="rule">Usa el mismo alias en todos los retos; será visible en el ranking board.</p>
+
+    <form id="loginForm" class="form" autocomplete="off" novalidate>
+      <!-- Contraseña (arriba) -->
       <div>
-        <label for="user">Alias: (tu alias aparecera en el ranking board)</label>
-        <input id="user" name="user" type="text" value="admin" readonly aria-readonly="true">
+        <label for="pass">Contraseña (4 dígitos)</label>
+        <input id="pass" name="pass" type="tel" inputmode="numeric" pattern="\\d{4}" maxlength="4" placeholder="####" autocomplete="off" required aria-required="true">
       </div>
+
+      <!-- Alias (abajo) -->
       <div>
-        <label for="pass">Contraseña</label>
-        <input id="pass" name="pass" type="tel" inputmode="numeric" pattern="\\d{4}" maxlength="4" placeholder="####" autocomplete="off" required>
+        <label for="alias">Alias</label>
+        <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
       </div>
+
+      <!-- Botón -->
       <div>
-        <button type="submit" aria-label="Probar login">Enviar</button>
+        <button id="submitBtn" type="submit" aria-label="Enviar respuesta">Enviar respuesta</button>
       </div>
     </form>
 
     <div id="status" class="status" aria-live="polite"></div>
-    <div id="flag" class="flag" style="display:none">HLMX{fortinet_2000}</div>
-
-    <p class="footer"></p>
+    <div id="flag" class="flag">HLMX{fortinet_2000}</div>
   </main>
 
   <script>
-
-    const EXPECTED_HEX = "81a83544cf93c245178cbc1620030f1123f435af867c79d87135983c52ab39d9";
-
-    async function sha256Hex(text){
-      const enc = new TextEncoder().encode(text.trim());
-      const buf = await crypto.subtle.digest('SHA-256', enc);
-      const arr = Array.from(new Uint8Array(buf));
-      return arr.map(b => b.toString(16).padStart(2,"0")).join("");
-    }
+    // === CONFIG ===
+    const ENDPOINT = 'YOUR_APPS_SCRIPT_URL_HERE'; // <-- Reemplaza por tu URL de despliegue de Apps Script
+    const STATION_ID = 'fortinet-1';
 
     const form = document.getElementById('loginForm');
     const pass = document.getElementById('pass');
+    const alias = document.getElementById('alias');
     const statusEl = document.getElementById('status');
     const flagEl = document.getElementById('flag');
+    const btn = document.getElementById('submitBtn');
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
-      statusEl.textContent = "";
-      flagEl.style.display = "none";
+      statusEl.textContent = '';
+      flagEl.style.display = 'none';
 
-      const pwd = (pass.value || "").trim();
+      const pwd = (pass.value || '').trim();
+      const userAlias = (alias.value || '').trim();
 
       if(!/^\d{4}$/.test(pwd)){
-        statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos .</span>';
+        statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos (ej. 2000).</span>';
+        pass.focus();
+        return;
+      }
+      if(userAlias.length < 2){
+        statusEl.innerHTML = '<span class="err">Escribe un alias válido (mínimo 2 caracteres).</span>';
+        alias.focus();
         return;
       }
 
+      btn.disabled = true; btn.textContent = 'Enviando...';
+
       try{
-        const hex = await sha256Hex(pwd);
-        if(hex === EXPECTED_HEX){
-          statusEl.innerHTML = '<span class="ok">¡Correcto! Credenciales válidas, obtuviste 500 puntos.</span>';
-          flagEl.style.display = "block";
-          // Opcional: aquí podrías hacer fetch() a tu backend para registrar solve
+        // Usamos x-www-form-urlencoded para que Apps Script lo reciba en e.parameter
+        const body = new URLSearchParams({
+          station_id: STATION_ID,
+          alias: userAlias,
+          flag: pwd,
+          user_agent: navigator.userAgent // se registrará en la hoja
+        });
+
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body
+        });
+
+        const json = await res.json();
+
+        if(!json.ok){
+          // Mensajes esperados desde Apps Script (ej. alias duplicado o station_id no configurado)
+          statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'No se pudo registrar la respuesta.') + '</span>';
         }else{
-          statusEl.innerHTML = '<span class="err">Respuesta incorrecta.</span>';
+          if(json.correct){
+            statusEl.innerHTML = '<span class="ok">¡Correcto! Respuesta válida — obtuviste ' + (json.points||0) + ' puntos.</span>';
+            flagEl.style.display = 'block';
+          }else{
+            statusEl.innerHTML = '<span class="err">Respuesta incorrecta. Intenta de nuevo.</span>';
+          }
         }
       }catch(err){
         console.error(err);
-        statusEl.innerHTML = '<span class="err">Ocurrió un error al verificar. Intenta de nuevo.</span>';
+        statusEl.innerHTML = '<span class="err">Error de red o del servicio. Intenta nuevamente.</span>';
+      }finally{
+        btn.disabled = false; btn.textContent = 'Enviar respuesta';
       }
     });
 
-    // UX: enfocar contraseña al cargar
+    // UX
     window.addEventListener('DOMContentLoaded', () => pass.focus());
+    function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   </script>
 </body>
 </html>
+
