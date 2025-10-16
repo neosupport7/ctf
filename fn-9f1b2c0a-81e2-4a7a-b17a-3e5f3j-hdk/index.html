@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CTF — Reto 3 (SIEMENS — Cifrado César)</title>
-  <meta name="description" content="Mini-CTF: Reto SIEMENS — Descifra el texto cifrado con desplazamiento César +1." />
+  <title>CTF — Reto 1 (Fortinet)</title>
+  <meta name="description" content="Mini-CTF: Reto 1 — Descubre el login correcto." />
   <meta name="robots" content="noindex,nofollow">
   <style>
     :root{
@@ -39,7 +39,6 @@
     .hint{color:var(--warn);font-weight:700;margin-top:8px}
     .rule{color:var(--muted);font-size:13px;margin-top:8px}
     .form{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-    .inline{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     label{font-size:13px;color:#cfe6dd;opacity:.95}
     input{
       width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);
@@ -63,129 +62,55 @@
       border-radius:12px;background:rgba(0,255,159,.06);color:#c9ffe8;font-weight:800;
       word-break:break-all;display:none
     }
-    .cipher{
-      margin-top:10px;padding:12px;border:1px dashed rgba(255,255,255,.14);
-      border-radius:12px;background:rgba(255,255,255,.03);color:#e7f6f1;font-size:1.1rem;text-align:center;letter-spacing:0.15em
-    }
-    @media (max-width:640px){ .inline{grid-template-columns:1fr} button{width:100%} .form{gap:10px} }
+    @media (max-width:640px){ button{width:100%} .form{gap:10px} }
   </style>
 </head>
 <body>
   <main class="wrap" role="main" aria-labelledby="title">
-    <h1 id="title">CTF — Reto 3 (SIEMENS — Cifrado César)</h1>
+    <h1 id="title">CTF — Reto 1 (Fortinet)</h1>
 
-    <p><strong>Descifra el siguiente texto cifrado con desplazamiento César +1.</strong><br>
-      Cada letra fue movida una posición.
+    <p><strong>¿Cuál es el login de este portal?</strong><br>
+      El usuario dejó el usuario: <strong>admin</strong>.<br>
+      La contraseña es un número de <strong>4 dígitos</strong>.
     </p>
 
-    <div>
-      <div class="rule">Texto cifrado:</div>
-      <div class="cipher">TFDVSJUZ</div>
-    </div>
-
-    <p class="hint">Pista: resta 1 a cada letra.</p>
+    <p class="hint">Pista: ¿en qué año nació Fortinet?</p>
 
     <form id="loginForm" class="form" autocomplete="off" novalidate>
-      <!-- Flag -->
+      <!-- Contraseña (arriba) -->
       <div>
-        <label for="flag">Contraseña / Flag (palabra descifrada)</label>
-        <input id="flag" name="flag" type="text" placeholder="Ejemplo: XXXXXXXX" maxlength="40" autocomplete="off" required aria-required="true">
+        <label for="pass">Contraseña (4 dígitos)</label>
+        <input id="pass" name="pass" type="tel" inputmode="numeric" pattern="\\d{4}" maxlength="4" placeholder="####" autocomplete="off" required aria-required="true">
       </div>
 
-      <!-- Alias + Company -->
-      <div class="inline">
-        <div>
-          <label for="alias">Alias</label>
-          <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
-        </div>
-        <div>
-          <label for="company">Compañía</label>
-          <input id="company" name="company" type="text" placeholder="empresa" maxlength="50" autocomplete="off">
-        </div>
+      <!-- Alias -->
+      <div>
+        <label for="alias">Alias (utiliza el mismo alias en todos los retos; será visible en el ranking board)</label>
+        <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
       </div>
 
+      <!-- Compañía -->
+      <div>
+        <label for="company">Compañía</label>
+        <input id="company" name="company" type="text" placeholder="empresa" maxlength="50" autocomplete="off">
+      </div>
+
+      <!-- Botón -->
       <div>
         <button id="submitBtn" type="submit" aria-label="Enviar respuesta">Enviar respuesta</button>
       </div>
     </form>
 
     <div id="status" class="status" aria-live="polite"></div>
-    <div id="flagOK" class="flag">¡Reto SIEMENS resuelto!</div>
+    <div id="flagOK" class="flag">¡Reto Fortinet resuelto!</div>
   </main>
 
   <script>
     // === CONFIG ===
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
-    const STATION_ID = 'siemens-1';
+    const STATION_ID = 'fortinet-1';
 
-    const form = document.getElementById('loginForm');
-    const flagInput = document.getElementById('flag');
-    const aliasInput = document.getElementById('alias');
-    const companyInput = document.getElementById('company');
-    const statusEl = document.getElementById('status');
-    const okEl = document.getElementById('flagOK');
-    const btn = document.getElementById('submitBtn');
+    const form = document.getElem
+::contentReference[oaicite:0]{index=0}
 
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      statusEl.textContent = '';
-      okEl.style.display = 'none';
-
-      const flagVal = (flagInput.value || '').trim();
-      const userAlias = (aliasInput.value || '').trim();
-      const companyVal = (companyInput.value || '').trim();
-
-      if(flagVal.length < 3){
-        statusEl.innerHTML = '<span class="err">Escribe la palabra completa.</span>';
-        flagInput.focus();
-        return;
-      }
-      if(userAlias.length < 2){
-        statusEl.innerHTML = '<span class="err">Escribe un alias válido (mínimo 2 caracteres).</span>';
-        aliasInput.focus();
-        return;
-      }
-
-      btn.disabled = true; btn.textContent = 'Enviando...';
-
-      try{
-        const body = new URLSearchParams({
-          station_id: STATION_ID,
-          alias: userAlias,
-          company: companyVal,
-          flag: flagVal,
-          user_agent: navigator.userAgent
-        });
-
-        const res = await fetch(ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body
-        });
-
-        const json = await res.json();
-
-        if(!json.ok){
-          statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'No se pudo registrar la respuesta.') + '</span>';
-        }else{
-          if(json.correct){
-            statusEl.innerHTML = '<span class="ok">¡Correcto! Respuesta válida — obtuviste ' + (json.points||0) + ' puntos.</span>';
-            okEl.style.display = 'block';
-          }else{
-            statusEl.innerHTML = '<span class="err">Respuesta incorrecta. Intenta de nuevo.</span>';
-          }
-        }
-      }catch(err){
-        console.error(err);
-        statusEl.innerHTML = '<span class="err">Error de red o del servicio. Intenta nuevamente.</span>';
-      }finally{
-        btn.disabled = false; btn.textContent = 'Enviar respuesta';
-      }
-    });
-
-    window.addEventListener('DOMContentLoaded', () => flagInput.focus());
-    function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-  </script>
-</body>
-</html>
 
