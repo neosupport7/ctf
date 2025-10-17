@@ -67,10 +67,24 @@
       border-radius:12px;background:rgba(255,255,255,.03);color:#e7f6f1;word-break:break-all;font-family:monospace
     }
     @media (max-width:640px){ button{width:100%} .form{gap:10px} }
+
+    /* === BLOQUEO DE SELECCIÓN Y COPIA === */
+    .no-select, .no-select * {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+      touch-action: manipulation;
+    }
+    .no-select input, .no-select textarea, .no-select [contenteditable="true"], .no-select button {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
   </style>
 </head>
 <body>
-  <main class="wrap" role="main" aria-labelledby="title">
+  <main class="wrap no-select" role="main" aria-labelledby="title">
     <h1 id="title">CTF — Reto 2 (SANS — Base64)</h1>
 
     <p><strong>Este texto está codificado en Base64.</strong><br>
@@ -85,25 +99,21 @@
     <p class="hint">Pista: técnica de ingeniería social.</p>
 
     <form id="loginForm" class="form" autocomplete="off" novalidate>
-      <!-- Flag / Contraseña -->
       <div>
         <label for="flag">Contraseña / Flag (MAYÚSCULAS)</label>
         <input id="flag" name="flag" type="text" placeholder="XXXXX" maxlength="40" autocomplete="off" required aria-required="true" style="text-transform:uppercase">
       </div>
 
-      <!-- Alias -->
       <div>
         <label for="alias">Alias (utiliza el mismo alias en todos los retos; será visible en el ranking board)</label>
         <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
       </div>
 
-      <!-- Compañía -->
       <div>
         <label for="company">Compañía</label>
         <input id="company" name="company" type="text" placeholder="empresa" maxlength="50" autocomplete="off">
       </div>
 
-      <!-- Botón -->
       <div>
         <button id="submitBtn" type="submit" aria-label="Enviar respuesta">Enviar respuesta</button>
       </div>
@@ -112,6 +122,23 @@
     <div id="status" class="status" aria-live="polite"></div>
     <div id="flagOK" class="flag">¡Reto SANS resuelto!</div>
   </main>
+
+  <!-- BLOQUEO EXTRA -->
+  <script>
+    (function(){
+      window.addEventListener('contextmenu', e => e.preventDefault(), {passive:false});
+      ['copy','cut','paste'].forEach(ev=>{
+        document.addEventListener(ev, e=>e.preventDefault(), {passive:false});
+      });
+      document.addEventListener('selectionchange', ()=>{
+        const sel = window.getSelection();
+        if(sel && !sel.isCollapsed) sel.removeAllRanges();
+      });
+      document.addEventListener('keydown', e=>{
+        if((e.ctrlKey||e.metaKey) && (e.key==='c'||e.key==='C')) e.preventDefault();
+      });
+    })();
+  </script>
 
   <script>
     // === CONFIG ===
@@ -131,7 +158,6 @@
       statusEl.textContent = '';
       okEl.style.display = 'none';
 
-      // Force uppercase for submission to match server flag
       const flagVal = (flagInput.value || '').trim().toUpperCase();
       const userAlias = (aliasInput.value || '').trim();
       const companyVal = (companyInput.value || '').trim();
@@ -161,7 +187,7 @@
         const res = await fetch(ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body
+          body: body.toString()
         });
 
         const json = await res.json();
@@ -184,13 +210,9 @@
       }
     });
 
-    // UX: force visual uppercase while typing
-    flagInput.addEventListener('input', () => {
-      flagInput.value = flagInput.value.toUpperCase();
-    });
-
+    flagInput.addEventListener('input', () => flagInput.value = flagInput.value.toUpperCase());
     window.addEventListener('DOMContentLoaded', () => flagInput.focus());
-    function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+    function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   </script>
 </body>
 </html>
