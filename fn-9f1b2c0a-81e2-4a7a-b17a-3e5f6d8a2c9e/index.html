@@ -67,10 +67,24 @@
       border-radius:12px;background:rgba(255,255,255,.03);color:#e7f6f1;font-size:1.1rem;text-align:center;letter-spacing:0.15em
     }
     @media (max-width:640px){ button{width:100%} .form{gap:10px} }
+
+    /* === BLOQUEO DE SELECCIÓN Y COPIA === */
+    .no-select, .no-select * {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+      touch-action: manipulation;
+    }
+    .no-select input, .no-select textarea, .no-select [contenteditable="true"], .no-select button {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
   </style>
 </head>
 <body>
-  <main class="wrap" role="main" aria-labelledby="title">
+  <main class="wrap no-select" role="main" aria-labelledby="title">
     <h1 id="title">CTF — Reto 3 (SIEMENS — Cifrado César)</h1>
 
     <p><strong>Descifra el siguiente texto cifrado con desplazamiento César +1.</strong><br>
@@ -111,6 +125,23 @@
     <div id="status" class="status" aria-live="polite"></div>
     <div id="flagOK" class="flag">¡Reto SIEMENS resuelto!</div>
   </main>
+
+  <!-- BLOQUEO EXTRA: menú contextual y copia -->
+  <script>
+    (function(){
+      window.addEventListener('contextmenu', e => e.preventDefault(), {passive:false});
+      ['copy','cut','paste'].forEach(ev=>{
+        document.addEventListener(ev, e=>e.preventDefault(), {passive:false});
+      });
+      document.addEventListener('selectionchange', ()=>{
+        const sel = window.getSelection();
+        if(sel && !sel.isCollapsed) sel.removeAllRanges();
+      });
+      document.addEventListener('keydown', e=>{
+        if((e.ctrlKey||e.metaKey) && (e.key==='c'||e.key==='C')) e.preventDefault();
+      });
+    })();
+  </script>
 
   <script>
     // === CONFIG ===
@@ -159,7 +190,7 @@
         const res = await fetch(ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body
+          body: body.toString()
         });
 
         const json = await res.json();
@@ -183,9 +214,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', () => flagInput.focus());
-    function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+    function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   </script>
 </body>
 </html>
-
-
