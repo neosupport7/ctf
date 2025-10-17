@@ -63,10 +63,24 @@
       word-break:break-all;display:none
     }
     @media (max-width:640px){ button{width:100%} .form{gap:10px} }
+
+    /* === BLOQUEO DE SELECCIÓN Y COPIA === */
+    .no-select, .no-select * {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+      touch-action: manipulation;
+    }
+    .no-select input, .no-select textarea, .no-select [contenteditable="true"], .no-select button {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
   </style>
 </head>
 <body>
-  <main class="wrap" role="main" aria-labelledby="title">
+  <main class="wrap no-select" role="main" aria-labelledby="title">
     <h1 id="title">CTF — Reto 1 (Fortinet)</h1>
 
     <p><strong>¿Cuál es el login de este portal?</strong><br>
@@ -105,6 +119,23 @@
     <div id="flagOK" class="flag">¡Reto Fortinet resuelto!</div>
   </main>
 
+  <!-- BLOQUEO EXTRA -->
+  <script>
+    (function(){
+      window.addEventListener('contextmenu', e => e.preventDefault(), {passive:false});
+      ['copy','cut','paste'].forEach(ev=>{
+        document.addEventListener(ev, e=>e.preventDefault(), {passive:false});
+      });
+      document.addEventListener('selectionchange', ()=>{
+        const sel = window.getSelection();
+        if(sel && !sel.isCollapsed) sel.removeAllRanges();
+      });
+      document.addEventListener('keydown', e=>{
+        if((e.ctrlKey||e.metaKey) && (e.key==='c'||e.key==='C')) e.preventDefault();
+      });
+    })();
+  </script>
+
   <script>
     // === CONFIG ===
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
@@ -118,7 +149,6 @@
     const okEl = document.getElementById('flagOK');
     const btn = document.getElementById('submitBtn');
 
-    // Escape simple HTML for status messages
     function escapeHtml(s){ return String(s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
     form.addEventListener('submit', async (e) => {
@@ -130,7 +160,6 @@
       const userAlias = (aliasInput.value || '').trim();
       const companyVal = (companyInput.value || '').trim();
 
-      // Validaciones
       if (!/^\d{4}$/.test(pwd)) {
         statusEl.innerHTML = '<span class="err">Formato inválido. Deben ser 4 dígitos (ej. 2000).</span>';
         passInput.focus();
@@ -160,20 +189,15 @@
           body: body.toString()
         });
 
-        // Si la respuesta no es JSON (error 500 u otro) eso se captura abajo
         const json = await res.json();
 
         if (!json.ok) {
-          // respuesta de servidor con ok=false
           statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'No se pudo registrar la respuesta.') + '</span>';
         } else {
-          // ok:true
           if (json.correct) {
             statusEl.innerHTML = '<span class="ok">¡Correcto! Respuesta válida — obtuviste ' + (json.points || 0) + ' puntos.</span>';
             okEl.style.display = 'block';
-            // opcional: mostrar la bandera real aquí o enlazar a la siguiente pista
           } else {
-            // En tu configuración actual, respuestas incorrectas no se registran (doPost devuelve ok:true, correct:false)
             statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'Respuesta incorrecta. Intenta de nuevo.') + '</span>';
           }
         }
@@ -186,7 +210,6 @@
       }
     });
 
-    // UX: foco inicial
     window.addEventListener('DOMContentLoaded', () => passInput.focus());
   </script>
 </body>
