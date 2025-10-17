@@ -69,10 +69,24 @@
     }
     code{color:#d7fff0}
     @media (max-width:640px){ button{width:100%} .form{gap:10px} }
+
+    /* === BLOQUEO DE SELECCIÓN Y COPIA === */
+    .no-select, .no-select * {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+      touch-action: manipulation;
+    }
+    .no-select input, .no-select textarea, .no-select [contenteditable="true"], .no-select button {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
   </style>
 </head>
 <body>
-  <main class="wrap" role="main" aria-labelledby="title">
+  <main class="wrap no-select" role="main" aria-labelledby="title">
     <h1 id="title">CTF — Reto 4 (AIPyC)</h1>
 
     <p><strong>Analiza el siguiente fragmento de logs y determina la IP atacante.</strong><br>
@@ -86,29 +100,25 @@ Oct 16 10:45:15 server sshd[2147]: Failed password for root from 10.0.0.15 port 
 Oct 16 10:45:17 server sshd[2148]: Failed password for root from 10.0.0.15 port 40324 ssh2
 Oct 16 10:45:18 server sshd[2149]: Failed password for root from 10.0.0.15 port 40325 ssh2</code></pre>
 
-    <p class="hint">Pista: la IP que esta haciendo fuerza bruta.</p>
+    <p class="hint">Pista: la IP que está haciendo fuerza bruta.</p>
 
     <form id="loginForm" class="form" autocomplete="off" novalidate>
-      <!-- Flag / IP atacante -->
       <div>
         <label for="flag">Dirección IP: </label>
         <input id="flag" name="flag" type="text" placeholder="e.g. x.x.x.x" maxlength="50" autocomplete="off" required aria-required="true"
                pattern="^\\s*(?:(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\s*$">
       </div>
 
-      <!-- Alias -->
       <div>
         <label for="alias">Alias (utiliza el mismo alias en todos los retos; será visible en el ranking board)</label>
         <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
       </div>
 
-      <!-- Compañía -->
       <div>
         <label for="company">Compañía</label>
         <input id="company" name="company" type="text" placeholder="empresa" maxlength="50" autocomplete="off">
       </div>
 
-      <!-- Botón -->
       <div>
         <button id="submitBtn" type="submit" aria-label="Enviar respuesta">Enviar respuesta</button>
       </div>
@@ -117,6 +127,27 @@ Oct 16 10:45:18 server sshd[2149]: Failed password for root from 10.0.0.15 port 
     <div id="status" class="status" aria-live="polite"></div>
     <div id="flagOK" class="flag">¡Reto AIPyC resuelto!</div>
   </main>
+
+  <script>
+    // === BLOQUEO DE COPIA, CONTEXTO Y SELECCIÓN EXTRA ===
+    (function(){
+      // Evita menú contextual
+      window.addEventListener('contextmenu', e => e.preventDefault(), {passive:false});
+      // Bloquea copy/cut/paste
+      ['copy','cut','paste'].forEach(ev=>{
+        document.addEventListener(ev, e=>e.preventDefault(), {passive:false});
+      });
+      // Elimina selecciones residuales
+      document.addEventListener('selectionchange', ()=>{
+        const sel = window.getSelection();
+        if(sel && !sel.isCollapsed) sel.removeAllRanges();
+      });
+      // Bloquea Ctrl/Cmd + C
+      document.addEventListener('keydown', e=>{
+        if((e.ctrlKey||e.metaKey) && (e.key==='c'||e.key==='C')) e.preventDefault();
+      });
+    })();
+  </script>
 
   <script>
     // === CONFIG ===
@@ -142,7 +173,6 @@ Oct 16 10:45:18 server sshd[2149]: Failed password for root from 10.0.0.15 port 
       const userAlias = (aliasInput.value || '').trim();
       const companyVal = (companyInput.value || '').trim();
 
-      // Validación IPv4 simple por pattern del input (opcional reforzar aquí)
       const ipRegex = /^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/;
       if (!ipRegex.test(ip)) {
         statusEl.innerHTML = '<span class="err">Formato de IP inválido. Ejemplo: 10.0.0.15</span>';
@@ -181,7 +211,6 @@ Oct 16 10:45:18 server sshd[2149]: Failed password for root from 10.0.0.15 port 
             statusEl.innerHTML = '<span class="ok">¡Correcto! Respuesta válida — obtuviste ' + (json.points||0) + ' puntos.</span>';
             okEl.style.display = 'block';
           }else{
-            // El backend no registra incorrectas (solo devuelve ok:true, correct:false)
             statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'Respuesta incorrecta. Intenta de nuevo.') + '</span>';
           }
         }
@@ -193,9 +222,7 @@ Oct 16 10:45:18 server sshd[2149]: Failed password for root from 10.0.0.15 port 
       }
     });
 
-    // UX
     window.addEventListener('DOMContentLoaded', () => flagInput.focus());
   </script>
 </body>
 </html>
-
