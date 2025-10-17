@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CTF — Reto 4 (AIPyC — Análisis de Logs)</title>
-  <meta name="description" content="Mini-CTF: AIPyC — Identifica la IP atacante a partir de un fragmento de logs." />
+  <meta name="description" content="CTF: AIPyC — Identifica la IP atacante a partir de un fragmento de logs." />
   <meta name="robots" content="noindex,nofollow">
   <style>
     :root{
@@ -86,13 +86,13 @@ Oct 16 10:45:15 server sshd[2147]: Failed password for root from 10.0.0.15 port 
 Oct 16 10:45:17 server sshd[2148]: Failed password for root from 10.0.0.15 port 40324 ssh2
 Oct 16 10:45:18 server sshd[2149]: Failed password for root from 10.0.0.15 port 40325 ssh2</code></pre>
 
-    <p class="hint">Pista: la IP que más repite intentos en muy poco tiempo.</p>
+    <p class="hint">Pista: la IP que esta haciendo fuerza bruta.</p>
 
     <form id="loginForm" class="form" autocomplete="off" novalidate>
       <!-- Flag / IP atacante -->
       <div>
-        <label for="flag">Dirección IP atacante (IPv4)</label>
-        <input id="flag" name="flag" type="text" placeholder="e.g. 10.0.0.15" maxlength="50" autocomplete="off" required aria-required="true"
+        <label for="flag">Dirección IP: </label>
+        <input id="flag" name="flag" type="text" placeholder="e.g. x.x.x.x" maxlength="50" autocomplete="off" required aria-required="true"
                pattern="^\\s*(?:(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\s*$">
       </div>
 
