@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CTF — Reto 5 (Geo-IP)</title>
+  <meta name="description" content="Mini-CTF: Determina el país de una dirección IP usando herramientas públicas." />
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root{
+      --bg-card:rgba(10,14,20,.8);
+      --text:#e6edf3;
+      --accent-strong:#00ff9f;
+      --border:rgba(255,255,255,.12);
+      --warn:#ffd36b;
+      --muted:#9fb0c3;
+      --ok:#5ee3a4;
+      --err:#ff7b7b;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;color:var(--text);
+      background:linear-gradient(135deg,#000 0%,#0b0f14 50%,#001a12 100%);
+      background-size:300% 300%;animation:gradientMove 12s ease infinite;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Cascadia Mono","Courier New",monospace;
+      display:flex;align-items:center;justify-content:center;padding:24px;min-height:100vh;
+    }
+    @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+      background:repeating-linear-gradient(rgba(0,229,143,0.04) 0px,rgba(0,229,143,0.04) 1px,transparent 2px,transparent 4px);
+    }
+    .wrap{
+      width:min(760px,100%);position:relative;z-index:2;border-radius:18px;border:1px solid var(--border);
+      background:var(--bg-card);box-shadow:0 8px 30px rgba(0,0,0,.28),inset 0 0 0 1px rgba(0,255,159,.05);padding:22px;
+    }
+    h1{margin:0 0 8px 0;text-transform:uppercase;letter-spacing:.06em;font-weight:900;font-size:clamp(24px,5vw,38px);color:var(--accent-strong);text-shadow:0 0 6px var(--accent-strong),0 0 14px rgba(0,229,143,.6)}
+    p{margin:10px 0;color:#d6e8e0;line-height:1.45}
+    .hint{color:var(--warn);font-weight:700;margin-top:8px}
+    .rule{color:var(--muted);font-size:13px;margin-top:8px}
+    .code{
+      margin-top:10px;padding:12px;border:1px dashed rgba(255,255,255,.14);
+      border-radius:12px;background:rgba(255,255,255,.03);color:#e7f6f1;word-break:break-all;font-family:monospace
+    }
+    .form{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+    label{font-size:13px;color:#cfe6dd;opacity:.95}
+    input{
+      width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);
+      background:#0a1218;color:var(--text);outline:none;font-size:15px;
+    }
+    input::placeholder{color:#8aa3a0}
+    button{
+      padding:12px 16px;border-radius:12px;border:1px solid var(--border);
+      background:linear-gradient(180deg,#0f1e1a,#0b1613);color:var(--text);cursor:pointer;
+      font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+      box-shadow:inset 0 0 0 1px rgba(0,255,159,.1);
+      align-self:flex-start;
+    }
+    button[disabled]{opacity:.6;cursor:not-allowed}
+    button:hover{box-shadow:0 0 20px rgba(0,255,159,.12),inset 0 0 0 1px rgba(0,255,159,.2)}
+    .status{margin-top:14px;font-size:14px}
+    .ok{color:var(--ok)}
+    .err{color:var(--err)}
+    .flag{
+      margin-top:16px;padding:14px;border:1px dashed rgba(0,255,159,.35);
+      border-radius:12px;background:rgba(0,255,159,.06);color:#c9ffe8;font-weight:800;
+      word-break:break-all;display:none
+    }
+    @media (max-width:640px){ button{width:100%} .form{gap:10px} }
+  </style>
+</head>
+<body>
+  <main class="wrap" role="main" aria-labelledby="title">
+    <h1 id="title">CTF — Reto 5 (Geo-IP)</h1>
+
+    <p><strong>¿A qué país pertenece?</strong><br>
+      Usa cualquier servicio público de búsqueda de IP (por ejemplo: herramientas de geolocalización de IP) para encontrar el país asociado.
+    </p>
+
+    <div class="rule">Dirección IP:</div>
+    <div class="code" id="ipShown">45.14.76.27</div>
+
+    <p class="hint">Escribe el <strong>país en MAYÚSCULAS</strong> (ej.: MÉXICO, ESPAÑA, ARGENTINA).</p>
+
+    <form id="loginForm" class="form" autocomplete="off" novalidate>
+      <!-- País (flag) -->
+      <div>
+        <label for="flag">País (MAYÚSCULAS)</label>
+        <input id="flag" name="flag" type="text" placeholder="PAÍS EN MAYÚSCULAS" maxlength="40" autocomplete="off" required aria-required="true" style="text-transform:uppercase">
+      </div>
+
+      <!-- Alias -->
+      <div>
+        <label for="alias">Alias (utiliza el mismo alias en todos los retos; será visible en el ranking board)</label>
+        <input id="alias" name="alias" type="text" placeholder="tu_alias" maxlength="30" autocomplete="off" required aria-required="true">
+      </div>
+
+      <!-- Compañía -->
+      <div>
+        <label for="company">Compañía</label>
+        <input id="company" name="company" type="text" placeholder="empresa" maxlength="50" autocomplete="off">
+      </div>
+
+      <!-- Botón -->
+      <div>
+        <button id="submitBtn" type="submit" aria-label="Enviar respuesta">Enviar respuesta</button>
+      </div>
+    </form>
+
+    <div id="status" class="status" aria-live="polite"></div>
+    <div id="flagOK" class="flag">¡Reto Geo-IP resuelto!</div>
+  </main>
+
+  <script>
+    // === CONFIG ===
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyhoVZ3ahIsjke2m5Vvb4HJUOIHYoI7CDPAYpdWftTfhGzPxWf1JoWeyY41cDED132u/exec';
+    const STATION_ID = 'policia-1';
+    // Si cambias la IP en el HTML, solo actualiza lo que muestres. La validación final la hace tu Apps Script con la FLAG (país en MAYÚSCULAS).
+
+    const form = document.getElementById('loginForm');
+    const flagInput = document.getElementById('flag');
+    const aliasInput = document.getElementById('alias');
+    const companyInput = document.getElementById('company');
+    const statusEl = document.getElementById('status');
+    const okEl = document.getElementById('flagOK');
+    const btn = document.getElementById('submitBtn');
+
+    // Helper
+    function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    // Forzar visualmente MAYÚSCULAS mientras escriben
+    flagInput.addEventListener('input', () => {
+      flagInput.value = flagInput.value.toUpperCase();
+    });
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      statusEl.textContent = '';
+      okEl.style.display = 'none';
+
+      const country = (flagInput.value || '').trim().toUpperCase(); // enviamos en MAYÚSCULAS
+      const userAlias = (aliasInput.value || '').trim();
+      const companyVal = (companyInput.value || '').trim();
+
+      if (country.length < 3) {
+        statusEl.innerHTML = '<span class="err">Escribe un país válido en MAYÚSCULAS.</span>';
+        flagInput.focus();
+        return;
+      }
+      if (userAlias.length < 2) {
+        statusEl.innerHTML = '<span class="err">Escribe un alias válido (mínimo 2 caracteres).</span>';
+        aliasInput.focus();
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Enviando...';
+
+      try{
+        const body = new URLSearchParams({
+          station_id: STATION_ID,
+          alias: userAlias,
+          company: companyVal,
+          flag: country, // El backend compara EXACTO y sensible a mayúsculas
+          user_agent: navigator.userAgent
+        });
+
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: body.toString()
+        });
+
+        const json = await res.json();
+
+        if(!json.ok){
+          statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'No se pudo registrar la respuesta.') + '</span>';
+        }else{
+          if(json.correct){
+            statusEl.innerHTML = '<span class="ok">¡Correcto! Respuesta válida — obtuviste ' + (json.points||0) + ' puntos.</span>';
+            okEl.style.display = 'block';
+          }else{
+            statusEl.innerHTML = '<span class="err">' + escapeHtml(json.msg || 'Respuesta incorrecta. Intenta de nuevo.') + '</span>';
+          }
+        }
+      }catch(err){
+        console.error(err);
+        statusEl.innerHTML = '<span class="err">Error de red o del servicio. Intenta nuevamente.</span>';
+      }finally{
+        btn.disabled = false; btn.textContent = 'Enviar respuesta';
+      }
+    });
+
+    // UX: foco inicial
+    window.addEventListener('DOMContentLoaded', () => flagInput.focus());
+  </script>
+</body>
+</html>
